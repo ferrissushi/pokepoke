@@ -28,4 +28,5 @@ export interface CreatedPokemon {
   id: string
   name: string
   types: string[]
+  image?: string
 }

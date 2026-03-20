@@ -1,10 +1,5 @@
-import { useState, useEffect } from 'react'
-
-interface CreatedPokemon {
-  id: string
-  name: string
-  types: string[]
-}
+import { useState, useEffect, useRef } from 'react'
+import type { CreatedPokemon } from '../types/pokemon'
 
 interface CreatePokemonModalProps {
   darkMode: boolean
@@ -16,12 +11,15 @@ interface CreatePokemonModalProps {
 export function CreatePokemonModal({ darkMode, isOpen, onClose, onCreate }: CreatePokemonModalProps) {
   const [name, setName] = useState('')
   const [types, setTypes] = useState<string[]>([])
+  const [image, setImage] = useState<string | null>(null)
   const [step, setStep] = useState(1)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     if (!isOpen) {
       setName('')
       setTypes([])
+      setImage(null)
       setStep(1)
     }
   }, [isOpen])
@@ -46,9 +44,20 @@ export function CreatePokemonModal({ darkMode, isOpen, onClose, onCreate }: Crea
     'rock', 'ghost', 'dragon', 'dark', 'steel', 'fairy'
   ]
 
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setImage(reader.result as string)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
   const handleSubmit = () => {
     if (name.trim() && types.length > 0) {
-      onCreate({ id: crypto.randomUUID(), name: name.trim(), types })
+      onCreate({ id: crypto.randomUUID(), name: name.trim(), types, image: image || undefined })
       onClose()
     }
   }
@@ -89,7 +98,6 @@ export function CreatePokemonModal({ darkMode, isOpen, onClose, onCreate }: Crea
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Enter Pokemon name..."
-                autoFocus
                 className={`w-full px-4 py-3 border-2 ${borderColor} ${inputBg} ${inputText} focus:outline-none text-lg`}
               />
               <button
@@ -131,9 +139,60 @@ export function CreatePokemonModal({ darkMode, isOpen, onClose, onCreate }: Crea
                 </button>
                 <button
                   type="button"
-                  onClick={handleSubmit}
+                  onClick={() => setStep(3)}
                   disabled={types.length === 0}
                   className={`flex-1 px-6 py-3 font-bold border-2 ${types.length > 0 ? btnBg : 'bg-zinc-700 text-zinc-500 border-zinc-700 cursor-not-allowed'}`}
+                >
+                  NEXT
+                </button>
+              </div>
+            </div>
+          )}
+
+          {step === 3 && (
+            <div className="space-y-4">
+              <h3 className={`text-lg font-bold ${inputText}`}>Step 3: Add Image (Optional)</h3>
+              <div 
+                className={`border-4 border-dashed ${borderColor} p-4 cursor-pointer hover:opacity-80 transition-opacity`}
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                />
+                {image ? (
+                  <img src={image} alt="Preview" className="w-full h-48 object-contain" />
+                ) : (
+                  <div className={`text-center py-8 ${inputText}`}>
+                    <p className="text-4xl mb-2">+</p>
+                    <p className="text-sm">Click to upload image</p>
+                  </div>
+                )}
+              </div>
+              {image && (
+                <button
+                  type="button"
+                  onClick={() => setImage(null)}
+                  className={`w-full text-sm ${inputText} hover:underline`}
+                >
+                  Remove image
+                </button>
+              )}
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setStep(2)}
+                  className={`flex-1 px-6 py-3 font-bold border-2 ${btnOutline}`}
+                >
+                  BACK
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSubmit}
+                  className={`flex-1 px-6 py-3 font-bold border-2 ${btnBg}`}
                 >
                   CREATE
                 </button>

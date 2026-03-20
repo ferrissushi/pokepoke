@@ -17,14 +17,22 @@ export function CreatedPokemonCard({ pokemon, darkMode, onDelete }: CreatedPokem
       <button
         type="button"
         onClick={() => onDelete(pokemon.id)}
-        className={`absolute top-2 right-2 w-6 h-6 flex items-center justify-center text-xs font-bold border ${deleteColor} ${borderColor} opacity-0 group-hover:opacity-100 transition-opacity`}
+        className={`absolute top-2 right-2 w-6 h-6 flex items-center justify-center text-xs font-bold border ${deleteColor} ${borderColor} opacity-0 group-hover:opacity-100 transition-opacity z-10`}
       >
         X
       </button>
       <div className="w-full h-32 flex items-center justify-center mb-2">
-        <div className={`w-20 h-20 border-4 ${borderColor} ${bgColor} flex items-center justify-center`}>
-          <span className={`text-3xl ${textColor}`}>?</span>
-        </div>
+        {pokemon.image ? (
+          <img 
+            src={pokemon.image} 
+            alt={pokemon.name} 
+            className="w-full h-full object-contain"
+          />
+        ) : (
+          <div className={`w-20 h-20 border-4 ${borderColor} ${bgColor} flex items-center justify-center`}>
+            <span className={`text-3xl ${textColor}`}>?</span>
+          </div>
+        )}
       </div>
       <p className={`text-center font-mono text-xs ${darkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>
         CREATED
