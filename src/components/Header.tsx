@@ -7,6 +7,10 @@ interface HeaderProps {
   onSearchChange: (value: string) => void
   typeFilter: string | null
   onTypeFilterChange: (value: string | null) => void
+  onCreateClick: () => void
+  onViewCreatedClick: () => void
+  createdCount: number
+  showCreatedPanel: boolean
 }
 
 const POKEMON_TYPES = [
@@ -21,7 +25,11 @@ export function Header({
   search,
   onSearchChange,
   typeFilter,
-  onTypeFilterChange
+  onTypeFilterChange,
+  onCreateClick,
+  onViewCreatedClick,
+  createdCount,
+  showCreatedPanel
 }: HeaderProps) {
   const [showDropdown, setShowDropdown] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
@@ -45,11 +53,14 @@ export function Header({
   const btnSecondary = darkMode 
     ? 'border-zinc-600 text-zinc-300 hover:bg-zinc-800' 
     : 'border-zinc-300 text-zinc-700 hover:bg-zinc-100'
+  const btnActive = darkMode 
+    ? 'bg-zinc-700 text-zinc-100 border-zinc-500' 
+    : 'bg-zinc-200 text-zinc-800 border-zinc-400'
   const dropdownBg = darkMode ? 'bg-zinc-900 border-zinc-600' : 'bg-zinc-50 border-zinc-300'
   const dropdownItem = darkMode ? 'hover:bg-zinc-800 text-zinc-300' : 'hover:bg-zinc-200 text-zinc-700'
 
   return (
-    <header className={`border-b-4 ${borderColor} ${darkMode ? 'bg-zinc-950' : 'bg-zinc-50'} sticky top-0 z-50`}>
+    <header className={`border-b-4 ${borderColor} ${darkMode ? 'bg-zinc-950' : 'bg-zinc-50'} sticky top-0 z-40`}>
       <div className="max-w-5xl mx-auto px-4 py-4">
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <h1 className={`text-2xl font-bold tracking-widest ${darkMode ? 'text-zinc-100' : 'text-zinc-800'}`}>
@@ -66,6 +77,27 @@ export function Header({
                 className={`w-full px-3 py-2 text-sm placeholder-zinc-500 focus:outline-none font-mono ${inputText}`}
               />
             </div>
+
+            <button
+              type="button"
+              onClick={onCreateClick}
+              className={`px-4 py-2 font-bold text-sm tracking-wide border-2 ${btnSecondary}`}
+            >
+              + CREATE
+            </button>
+
+            <button
+              type="button"
+              onClick={onViewCreatedClick}
+              disabled={createdCount === 0}
+              className={`px-4 py-2 font-bold text-sm tracking-wide border-2 ${
+                createdCount === 0 
+                  ? (darkMode ? 'border-zinc-800 text-zinc-700 cursor-not-allowed' : 'border-zinc-300 text-zinc-400 cursor-not-allowed')
+                  : (showCreatedPanel ? btnActive : btnSecondary)
+              }`}
+            >
+              CREATED ({createdCount})
+            </button>
             
             <div className="relative" ref={dropdownRef}>
               <button 
